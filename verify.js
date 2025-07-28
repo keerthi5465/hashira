@@ -47,4 +47,4 @@ points.forEach(point => {
     console.log(`f(${x}) = ${x}² + 3 = ${expected} ✓`);
 });
 
-console.log("\n✅ Test Case 1 answer of 3 is CORRECT!"); 
+console.log("\nTest Case 1 answer of 3 is CORRECT!"); 

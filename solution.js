@@ -12,7 +12,6 @@ function parseBigInt(str, base) {
     return result;
 }
 
-// Utility class for base conversion
 class BaseConverter {
     static parseInt(value, base) {
         return parseBigInt(value, base);
@@ -23,13 +22,10 @@ class BaseConverter {
     }
 }
 
-// Lagrange interpolation implementation
 class LagrangeInterpolation {
     static interpolate(points, prime = null) {
         const n = points.length;
         if (n === 0) return null;
-        
-        // Use a large prime for modular arithmetic
         if (!prime) {
             prime = BigInt(2) ** BigInt(256) - BigInt(189);
         }
@@ -86,29 +82,23 @@ class LagrangeInterpolation {
         return old_s < 0 ? old_s + m : old_s;
     }
 }
-
-// Main polynomial secret finder
 class PolynomialSecretFinder {
     constructor() {
         this.points = [];
     }
-    
-    // Parse JSON input and decode values
+
     parseInput(jsonInput) {
         const { keys } = jsonInput;
         this.n = keys.n;
         this.k = keys.k;
         this.degree = this.k - 1;
         
-        // Parse all points except the "keys" object
         for (const [key, value] of Object.entries(jsonInput)) {
             if (key === "keys") continue;
             
             const x = parseInt(key);
             const base = parseInt(value.base);
             const encodedValue = value.value;
-            
-            // Decode the value from the given base
             const y = BaseConverter.parseInt(encodedValue, base);
             
             this.points.push({ x: BigInt(x), y: y });
@@ -116,8 +106,6 @@ class PolynomialSecretFinder {
         
         return this.points;
     }
-    
-    // Generate all combinations of k points from n points
     generateCombinations(points, k) {
         const combinations = [];
         
@@ -137,14 +125,10 @@ class PolynomialSecretFinder {
         backtrack(0, []);
         return combinations;
     }
-    
-    // Find the constant term 'c' using Lagrange interpolation
     findConstantTerm() {
         const combinations = this.generateCombinations(this.points, this.k);
         const results = new Map();
         const resultCounts = new Map();
-        
-        // Try each combination
         for (let i = 0; i < combinations.length; i++) {
             const combination = combinations[i];
             
@@ -159,8 +143,6 @@ class PolynomialSecretFinder {
                 continue;
             }
         }
-        
-        // Find the most common result
         let maxCount = 0;
         let correctConstant = null;
         let correctCombination = null;
@@ -184,24 +166,16 @@ class PolynomialSecretFinder {
             totalCombinations: combinations.length
         };
     }
-    
-    // Main method to solve the problem
     solve(jsonInput) {
-        // Parse and decode input
         this.parseInput(jsonInput);
-        
-        // Find the constant term
         const result = this.findConstantTerm();
         
         return result;
     }
 }
 
-// Function to read and solve test cases
 function solveTestCases() {
     const finder = new PolynomialSecretFinder();
-    
-    // Test Case 1
     try {
         const testCase1 = JSON.parse(fs.readFileSync('testcase1.json', 'utf8'));
         const result1 = finder.solve(testCase1);
@@ -209,8 +183,6 @@ function solveTestCases() {
     } catch (error) {
         console.error(`Error in Test Case 1: ${error.message}`);
     }
-    
-    // Test Case 2
     try {
         const testCase2 = JSON.parse(fs.readFileSync('testcase2.json', 'utf8'));
         const result2 = finder.solve(testCase2);
@@ -219,15 +191,11 @@ function solveTestCases() {
         console.error(`Error in Test Case 2: ${error.message}`);
     }
 }
-
-// Export for use in other files
 module.exports = {
     PolynomialSecretFinder,
     BaseConverter,
     LagrangeInterpolation
 };
-
-// Run if this file is executed directly
 if (require.main === module) {
     solveTestCases();
 } 

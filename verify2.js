@@ -11,8 +11,6 @@ function parseBigInt(str, base) {
     }
     return result;
 }
-
-// Lagrange interpolation for constant term
 function lagrangeConstant(points) {
     const n = points.length;
     let secret = BigInt(0);
@@ -51,8 +49,6 @@ function modInverse(a, m) {
     if (x1 < 0) x1 += m0;
     return x1;
 }
-
-// Read and decode testcase2.json
 const data = JSON.parse(fs.readFileSync('testcase2.json', 'utf8'));
 const points = [];
 for (const [key, value] of Object.entries(data)) {
@@ -62,12 +58,8 @@ for (const [key, value] of Object.entries(data)) {
     const y = parseBigInt(value.value, base);
     points.push({ x: BigInt(x), y });
 }
-
-// Print all decoded points
 console.log('Decoded points:');
 points.forEach(p => console.log(`(${p.x}, ${p.y})`));
-
-// Use the first 7 points for interpolation
 const k = data.keys.k;
 const comb = points.slice(0, k);
 const constant = lagrangeConstant(comb);
