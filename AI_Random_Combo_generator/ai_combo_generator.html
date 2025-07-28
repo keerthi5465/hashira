@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menu Recommender</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: rgb(240, 244, 248);
+      color: rgb(51, 51, 51);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .combo-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgb(229, 231, 235);
+    }
+    .combo-item:last-child {
+      border-bottom: none;
+    }
+    .day-button {
+      background-color: rgb(226, 232, 240);
+      color: rgb(74, 85, 104);
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      margin: 4px;
+    }
+    .day-button:hover {
+      background-color: rgb(203, 213, 224);
+      transform: translateY(-1px);
+    }
+    .day-button.active {
+      background-color: rgb(66, 153, 225);
+      color: white;
+      box-shadow: 0px 4px 8px rgba(66, 153, 225, 0.4);
+    }
+    .refresh-button {
+      background-color: rgb(76, 175, 80);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .refresh-button:hover {
+      background-color: rgb(69, 160, 73);
+    }
+    .refresh-button:active {
+      transform: translateY(2px);
+    }
+    .combo-description {
+      font-size: 0.9em;
+      color: rgb(85, 85, 85);
+      margin-top: 10px;
+      line-height: 1.4;
+      background-color: rgb(249, 250, 251);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgb(229, 231, 235);
+    }
+    .combos-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .combos-grid.three-cols {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+  </style>
+</head>
+<body class="p-4">
+  <div class="container">
+    <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-8 mt-4">AI Menu Recommender</h1>
+    <div class="flex justify-center flex-wrap mb-8" id="dayButtonsContainer"></div>
+    <div class="flex justify-center mb-8">
+      <button id="refreshButton" class="refresh-button">Refresh Combos</button>
+    </div>
+    <div id="combosDisplayContainer" class="card">
+      <h2 id="currentDayTitle" class="text-3xl font-bold text-gray-700 mb-6 text-center"></h2>
+      <div id="combosContainer" class="grid grid-cols-1 gap-6"></div>
+    </div>
+  </div>
+
+  <script>
+    const menuDataCSV = `item_name,category,calories,taste_profile,popularity_score
+Paneer Butter Masala,main,450,spicy,0.9
+Chicken Biryani,main,600,spicy,0.95
+Vegetable Pulao,main,400,savory,0.7
+Rajma Chawal,main,500,savory,0.8
+Chole Bhature,main,650,spicy,0.85
+Masala Dosa,main,480,savory,0.88
+Grilled Sandwich,main,370,savory,0.6
+Garlic Naan,side,200,savory,0.9
+Mixed Veg Salad,side,150,sweet,0.75
+French Fries,side,350,savory,0.8
+Curd Rice,side,250,savory,0.7
+Papad,side,100,savory,0.65
+Paneer Tikka,side,300,spicy,0.85
+Masala Chaas,drink,100,spicy,0.8
+Sweet Lassi,drink,220,sweet,0.9
+Lemon Soda,drink,90,savory,0.7
+Cold Coffee,drink,180,sweet,0.75
+Coconut Water,drink,60,sweet,0.6
+Iced Tea,drink,120,sweet,0.78`;
+
+    let menuItems = { main: [], side: [], drink: [] };
+    let weeklyCombos = {};
+    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const threeComboDays = ['Monday', 'Tuesday', 'Wednesday'];
+    let currentActiveDay = 'Monday';
+
+    function parseCSV(csv) {
+      const lines = csv.trim().split('\n');
+      const headers = lines[0].split(',');
+
+      menuItems = { main: [], side: [], drink: [] };
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        if (values.length !== headers.length) {
+          console.warn(`Skipping malformed row: ${lines[i]}`);
+          continue;
+        }
+        const item = {};
+        headers.forEach((header, index) => {
+          item[header.trim()] = values[index].trim();
+        });
+        item.calories = parseInt(item.calories);
+        item.popularity_score = parseFloat(item.popularity_score);
+        if (menuItems[item.category]) {
+          menuItems[item.category].push(item);
+        } else {
+          console.warn(`Unknown category found: ${item.category}`);
+        }
+      }
+    }
+
+    function getRandomItem(category) {
+      const items = menuItems[category];
+      if (!items || items.length === 0) return null;
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function getComboKey(mainItem, sideItem, drinkItem) {
+      return [mainItem.item_name, sideItem.item_name, drinkItem.item_name].sort().join('|');
+    }
+
+    function generateSingleValidCombo(excludedComboKeys, excludedMainItems) {
+      const MAX_ATTEMPTS = 500;
+      for (let attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
+        const main = getRandomItem('main');
+        const side = getRandomItem('side');
+        const drink = getRandomItem('drink');
+        if (!main || !side || !drink) continue;
+
+        const key = getComboKey(main, side, drink);
+        if (excludedComboKeys.has(key) || excludedMainItems.has(main.item_name)) continue;
+
+        const totalCalories = main.calories + side.calories + drink.calories;
+        const tasteSet = new Set([main.taste_profile, side.taste_profile, drink.taste_profile]);
+        const itemSet = new Set([main.item_name, side.item_name, drink.item_name]);
+
+        if (totalCalories >= 500 && totalCalories <= 800 && tasteSet.size === 3 && itemSet.size === 3) {
+          excludedComboKeys.add(key);
+          excludedMainItems.add(main.item_name);
+          return { main, side, drink };
+        }
+      }
+      return null;
+    }
+
+    function generateCombosForWeek() {
+      weeklyCombos = {};
+      daysOfWeek.forEach(day => {
+        const count = threeComboDays.includes(day) ? 3 : 1;
+        const combos = [];
+        const keys = new Set();
+        const mains = new Set();
+        for (let i = 0; i < count; i++) {
+          const combo = generateSingleValidCombo(keys, mains);
+          if (combo) combos.push(combo);
+        }
+        weeklyCombos[day] = combos;
+      });
+    }
+
+    function renderDayButtons() {
+      const container = document.getElementById('dayButtonsContainer');
+      container.innerHTML = '';
+      daysOfWeek.forEach(day => {
+        const btn = document.createElement('button');
+        btn.className = `day-button ${day === currentActiveDay ? 'active' : ''}`;
+        btn.textContent = day;
+        btn.addEventListener('click', () => {
+          currentActiveDay = day;
+          renderCombosForDay(day);
+          document.querySelectorAll('.day-button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    function renderCombosForDay(day) {
+      const container = document.getElementById('combosContainer');
+      const title = document.getElementById('currentDayTitle');
+      container.innerHTML = '';
+      title.textContent = `${day}'s Menu Combos`;
+
+      const combos = weeklyCombos[day];
+      if (!combos || combos.length === 0) {
+        container.innerHTML = `<p class="text-center text-gray-500">No combos available for ${day}. Try refreshing!</p>`;
+        return;
+      }
+
+      container.className = `combos-grid ${combos.length === 3 ? 'three-cols' : ''}`;
+
+      combos.forEach((combo, i) => {
+        const totalCalories = combo.main.calories + combo.side.calories + combo.drink.calories;
+        const totalPopularity = combo.main.popularity_score + combo.side.popularity_score + combo.drink.popularity_score;
+
+        const desc = `A dynamic and unique meal for ${day} ${combos.length === 3 ? `(Option ${i + 1})` : ''}, 
+        featuring distinct taste profiles: Main (${combo.main.taste_profile}), Side (${combo.side.taste_profile}), 
+        Drink (${combo.drink.taste_profile}). Total calories: ${totalCalories} kcal.`;
+
+        const card = document.createElement('div');
+        card.className = 'border border-gray-200 rounded-lg p-4 bg-gray-50 shadow-md';
+        card.innerHTML = `
+          <h3 class="text-xl font-semibold text-gray-600 mb-3">${combos.length === 3 ? `Combo ${i + 1}` : `Today's Special`}</h3>
+          <div class="combo-item"><span>Main: ${combo.main.item_name}</span><span>${combo.main.calories} kcal | Pop: ${combo.main.popularity_score.toFixed(2)}</span></div>
+          <div class="combo-item"><span>Side: ${combo.side.item_name}</span><span>${combo.side.calories} kcal | Pop: ${combo.side.popularity_score.toFixed(2)}</span></div>
+          <div class="combo-item"><span>Drink: ${combo.drink.item_name}</span><span>${combo.drink.calories} kcal | Pop: ${combo.drink.popularity_score.toFixed(2)}</span></div>
+          <div class="mt-4 combo-description">${desc}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      parseCSV(menuDataCSV);
+      generateCombosForWeek();
+      renderDayButtons();
+      renderCombosForDay(currentActiveDay);
+
+      document.getElementById('refreshButton').addEventListener('click', () => {
+        generateCombosForWeek();
+        renderCombosForDay(currentActiveDay);
+      });
+    });
+  </script>
+</body>
+</html>

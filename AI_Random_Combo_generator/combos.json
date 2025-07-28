@@ -1,0 +1,163 @@
+[
+  {
+    "day": "Monday",
+    "items": [
+      {
+        "name": "Masala Dosa",
+        "category": "main",
+        "calories": 480,
+        "taste": "savory"
+      },
+      {
+        "name": "Mixed Veg Salad",
+        "category": "side",
+        "calories": 150,
+        "taste": "sweet"
+      },
+      {
+        "name": "Lemon Soda",
+        "category": "drink",
+        "calories": 90,
+        "taste": "savory"
+      }
+    ]
+  },
+  {
+    "day": "Tuesday",
+    "items": [
+      {
+        "name": "Vegetable Pulao",
+        "category": "main",
+        "calories": 400,
+        "taste": "savory"
+      },
+      {
+        "name": "Papad",
+        "category": "side",
+        "calories": 100,
+        "taste": "savory"
+      },
+      {
+        "name": "Lemon Soda",
+        "category": "drink",
+        "calories": 90,
+        "taste": "savory"
+      }
+    ]
+  },
+  {
+    "day": "Wednesday",
+    "items": [
+      {
+        "name": "Grilled Sandwich",
+        "category": "main",
+        "calories": 370,
+        "taste": "savory"
+      },
+      {
+        "name": "Paneer Tikka",
+        "category": "side",
+        "calories": 300,
+        "taste": "spicy"
+      },
+      {
+        "name": "Coconut Water",
+        "category": "drink",
+        "calories": 60,
+        "taste": "sweet"
+      }
+    ]
+  },
+  {
+    "day": "Thursday",
+    "items": [
+      {
+        "name": "Vegetable Pulao",
+        "category": "main",
+        "calories": 400,
+        "taste": "savory"
+      },
+      {
+        "name": "Mixed Veg Salad",
+        "category": "side",
+        "calories": 150,
+        "taste": "sweet"
+      },
+      {
+        "name": "Coconut Water",
+        "category": "drink",
+        "calories": 60,
+        "taste": "sweet"
+      }
+    ]
+  },
+  {
+    "day": "Friday",
+    "items": [
+      {
+        "name": "Chicken Biryani",
+        "category": "main",
+        "calories": 600,
+        "taste": "spicy"
+      },
+      {
+        "name": "Papad",
+        "category": "side",
+        "calories": 100,
+        "taste": "savory"
+      },
+      {
+        "name": "Masala Chaas",
+        "category": "drink",
+        "calories": 100,
+        "taste": "spicy"
+      }
+    ]
+  },
+  {
+    "day": "Saturday",
+    "items": [
+      {
+        "name": "Vegetable Pulao",
+        "category": "main",
+        "calories": 400,
+        "taste": "savory"
+      },
+      {
+        "name": "Curd Rice",
+        "category": "side",
+        "calories": 250,
+        "taste": "savory"
+      },
+      {
+        "name": "Coconut Water",
+        "category": "drink",
+        "calories": 60,
+        "taste": "sweet"
+      }
+    ]
+  },
+  {
+    "day": "Sunday",
+    "items": [
+      {
+        "name": "Grilled Sandwich",
+        "category": "main",
+        "calories": 370,
+        "taste": "savory"
+      },
+      {
+        "name": "Curd Rice",
+        "category": "side",
+        "calories": 250,
+        "taste": "savory"
+      },
+      {
+        "name": "Iced Tea",
+        "category": "drink",
+        "calories": 120,
+        "taste": "sweet"
+      }
+    ]
+  }
+]

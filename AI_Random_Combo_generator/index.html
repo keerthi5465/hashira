@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Combo Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        table, th, td { border: 1px solid #aaa; border-collapse: collapse; padding: 8px; }
+        th { background: #eee; }
+    </style>
+</head>
+<body>
+    <h1>Menu</h1>
+    <table id="menuTable"></table>
+    
+    <h2>Generate Combos</h2>
+    <label for="daySelect">Start Day:</label>
+    <select id="daySelect"></select>
+    <button onclick="generateCombos()">Generate</button>
+
+    <h2>Combos (Till Next Same Day)</h2>
+    <table id="comboTable"></table>
+
+    <script>
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const daySelect = document.getElementById('daySelect');
+
+        days.forEach(day => {
+            const opt = document.createElement('option');
+            opt.value = day;
+            opt.text = day;
+            daySelect.appendChild(opt);
+        });
+
+        fetch('/menu')
+            .then(res => res.json())
+            .then(menu => {
+                let html = '<tr><th>Name</th><th>Category</th><th>Calories</th><th>Taste</th><th>Popularity</th></tr>';
+                menu.forEach(item => {
+                    html += `<tr>
+                        <td>${item.item_name}</td>
+                        <td>${item.category}</td>
+                        <td>${item.calories}</td>
+                        <td>${item.taste_profile}</td>
+                        <td>${item.popularity_score}</td>
+                    </tr>`;
+                });
+                document.getElementById('menuTable').innerHTML = html;
+            });
+
+        function generateCombos() {
+            const day = daySelect.value;
+            fetch(`/generate_combos?start_day=${day}`)
+                .then(res => res.json())
+                .then(combos => {
+                    let html = '<tr><th>Day</th><th>Drink</th><th>Savory</th><th>Sweet</th><th>Popularity</th><th>Calories</th></tr>';
+                    combos.forEach(c => {
+                        html += `<tr>
+                            <td>${c.day}</td>
+                            <td>${c.combo[0]}</td>
+                            <td>${c.combo[1]}</td>
+                            <td>${c.combo[2]}</td>
+                            <td>${c.popularity}</td>
+                            <td>${c.calories}</td>
+                        </tr>`;
+                    });
+                    document.getElementById('comboTable').innerHTML = html;
+                });
+        }
+    </script>
+</body>
+</html>
