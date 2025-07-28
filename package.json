@@ -1,0 +1,21 @@
+{
+  "name": "polynomial-secret-finder",
+  "version": "1.0.0",
+  "description": "Solution for finding polynomial constant term using Shamir's Secret Sharing algorithm",
+  "main": "solution.js",
+  "scripts": {
+    "start": "node solution.js",
+    "test": "node solution.js"
+  },
+  "keywords": [
+    "polynomial",
+    "lagrange-interpolation",
+    "shamir-secret-sharing",
+    "cryptography"
+  ],
+  "author": "Hashira Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 
