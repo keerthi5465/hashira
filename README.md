@@ -18,18 +18,18 @@ The input is provided in JSON format with the following structure:
 ```json
 {
     "keys": {
-        "n": 4,        // Total number of points
-        "k": 3         // Minimum points required (k = m + 1)
+        "n": 4,        
+        "k": 3        
     },
     "1": {
-        "base": "10",  // Base for decoding
-        "value": "4"   // Encoded value
+        "base": "10",  
+        "value": "4"   
     },
     "2": {
         "base": "2",
         "value": "111"
     }
-    // ... more points
+    
 }
 ```
 
